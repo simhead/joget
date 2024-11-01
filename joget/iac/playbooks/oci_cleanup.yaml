@@ -1,0 +1,4 @@
+- hosts: bastion
+  become: true
+  roles:
+    - joget.iac.oci_cleanup

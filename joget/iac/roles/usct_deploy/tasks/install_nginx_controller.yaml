@@ -1,0 +1,87 @@
+# - name: Upload ssl cert private key
+#   copy:
+#     src: "{{ ansible_ssl_cert_private_key_file }}"
+#     dest: "/root/.ssh/ssl_cert_private_key.key"
+#     mode: "0600"
+
+# - name: Upload ssl cert file
+#   copy:
+#     src: "{{ ansible_ssl_cert_file }}"
+#     dest: "/root/.ssh/ssl_cert.pem"
+#     mode: "0600"
+
+# - name: Create ssl secret for rancher ingress tls
+#   shell: |
+#     kubectl create ns ingress-nginx
+#     kubectl -n ingress-nginx delete secret tls-ingress-nginx
+#     kubectl create secret tls tls-ingress-nginx -n ingress-nginx  \
+#     --cert=/root/.ssh/ssl_cert.pem \
+#     --key=/root/.ssh/ssl_cert_private_key.key
+#   ignore_errors: true
+  
+# - name: Remove ssl cert private key
+#   ansible.builtin.file:
+#     path: /root/.ssh/ssl_cert_private_key.key
+#     state: absent
+
+# - name: Remove ssl cert file
+#   ansible.builtin.file:
+#     path: /root/.ssh/ssl_cert.pem
+#     state: absent
+
+
+- name: Add a nginx helm repository
+  kubernetes.core.helm_repository:
+    name: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+
+# using network loadbalancer
+# - name: Install nginx controller
+#   kubernetes.core.helm:
+#     name: ingress-nginx
+#     chart_ref: ingress-nginx/ingress-nginx
+#     chart_version: 4.10.0
+#     release_namespace: ingress-nginx
+#     create_namespace: true
+#     update_repo_cache: true
+#     values:
+#       controller:
+#         extraArgs:
+#           default-ssl-certificate: "ingress-nginx/{{ domain | replace('.', '-') }}"
+#         service:
+#           externalTrafficPolicy: Local
+#           annotations:
+#             oci.oraclecloud.com/load-balancer-type: nlb
+#             oci-network-load-balancer.oraclecloud.com/is-preserve-source: "false"
+#             oci-network-load-balancer.oraclecloud.com/oci-network-security-groups: "{{nsg_lb_oke_k8s_cluster}}"
+
+- name: Install nginx controller
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: 4.10.0
+    release_namespace: ingress-nginx
+    create_namespace: true
+    update_repo_cache: true
+    values:
+      controller:
+        service:
+          externalTrafficPolicy: Cluster #Local
+          annotations:
+            service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+            service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+            service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
+            service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb2_subnet_id }}"
+            # Optional static IP for load balancer
+          #   service.beta.kubernetes.io/oci-load-balancer-ip-mode: "IPV4"  # Use IPV4; switch to IPV6 if needed
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-protocol: "HTTP"  # Health check protocol
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-url-path: "/"     # Health check URL path
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-interval: "10000" # Interval in ms
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-timeout: "3000"   # Timeout in ms
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-healthy-threshold: "3"
+          #   service.beta.kubernetes.io/oci-load-balancer-health-check-unhealthy-threshold: "3"
+          # loadBalancerIP: "{{ lb_pip }}"  # Static IP, if assigned
+
+
+- name: Get deployments in ingress-nginx namespace
+  shell: bash /root/check_deployment.sh ingress-nginx

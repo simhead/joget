@@ -1,0 +1,8 @@
+- hosts: bastion
+  become: true
+  environment:
+    KUBECONFIG: "/root/.kube/oke_k8s_config"
+  roles:
+    - joget.iac.bastion_common
+    - joget.iac.oke_common
+    - joget.iac.usct_deploy
