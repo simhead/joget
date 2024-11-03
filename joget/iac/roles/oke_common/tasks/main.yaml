@@ -119,7 +119,6 @@
 #     ./istio_install.sh
 #     rm /root/istio_install.sh
 
----
 # - name: Deploy NGINX Ingress Controller
 #   hosts: all
 #   become: true
