@@ -71,7 +71,7 @@
             service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
-            service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb2_subnet_id }}"
+            service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb_subnet_id }}"
             # Optional static IP for load balancer
           #   service.beta.kubernetes.io/oci-load-balancer-ip-mode: "IPV4"  # Use IPV4; switch to IPV6 if needed
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-protocol: "HTTP"  # Health check protocol
