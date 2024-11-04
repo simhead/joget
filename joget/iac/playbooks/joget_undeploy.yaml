@@ -3,4 +3,4 @@
   environment:
     KUBECONFIG: "/root/.kube/oke_k8s_config"
   roles:
-    - joget.iac.usct_undeploy
+    - joget.iac.joget_undeploy

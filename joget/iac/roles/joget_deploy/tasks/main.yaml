@@ -8,4 +8,4 @@
 - include_tasks: install_certmanager.yaml
 - include_tasks: install_nginx_controller.yaml
 #- include_tasks: update_zone_record.yaml
-#- include_tasks: install_usct.yaml
+#- include_tasks: install_joget.yaml

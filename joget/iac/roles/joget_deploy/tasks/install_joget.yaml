@@ -1,0 +1,47 @@
+- name: Copy chart overrides values
+  template:
+    src: "demo-builder-values.yaml.j2"
+    dest: "/root/govstack/joget_backend/sandbox-demo-builder/use-cases/joget-full/demo-builder-values.yaml"
+    mode: '0755'
+
+- name: Copy run migration scripts
+  template:
+    src: "run_migrations.sh.j2"
+    dest: "/root/run_migrations.sh"
+    mode: '0755'
+
+- name: Install joget
+  shell: |
+    cd /root/govstack/joget_backend/sandbox-demo-builder/use-cases
+    helm dependency update ./joget-full/
+    helm upgrade --install joget ./joget-full/ --create-namespace --namespace {{joget_namespace}} --values /root/govstack/joget_backend/sandbox-demo-builder/use-cases/joget-full/demo-builder-values.yaml
+
+- name: Wait for deployments
+  shell: bash /root/check_deployment.sh {{joget_namespace}}
+
+
+- name: Enable openimis backend
+  set_fact:
+    open_imis_backend_enabled: true
+
+- name: Copy chart overrides values
+  template:
+    src: "demo-builder-values.yaml.j2"
+    dest: "/root/govstack/joget_backend/sandbox-demo-builder/use-cases/joget-full/demo-builder-values.yaml"
+    mode: '0755'
+
+
+- name: Install joget with openimis backend
+  shell: |
+    cd /root/govstack/joget_backend/sandbox-demo-builder/use-cases
+    helm dependency update ./joget-full/
+    helm upgrade --install joget ./joget-full/ --create-namespace --namespace {{joget_namespace}} --values /root/govstack/joget_backend/sandbox-demo-builder/use-cases/joget-full/demo-builder-values.yaml
+
+- name: Wait for deployments
+  shell: bash /root/check_deployment.sh {{joget_namespace}}
+
+- name: Run open imis migrations
+  shell: bash /root/run_migrations.sh
+
+- name: Wait for deployments in joget namespace
+  shell: bash /root/check_deployment.sh sandbox-im

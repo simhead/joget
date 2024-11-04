@@ -1,4 +1,4 @@
-usct-backend:
+joget-backend:
   enabled: {{backend_enabled}}
   deployment:
     containers:
@@ -76,14 +76,14 @@ sandbox-im-x-road:
         tag: "latest-ss3"
         host: im-ss3.{{domain}}
 
-usct-frontend:
+joget-frontend:
   enabled: {{frontend_enabled}}
   containers:
     image: {{frontend_image}}
   ingress:
     enabled: {{frontend_ingress_enabled}}
     hosts:
-      - host: usct-frontend.{{domain}}
+      - host: joget-frontend.{{domain}}
         paths:
           - path: /
             pathType: Prefix
@@ -91,7 +91,7 @@ usct-frontend:
 consentbb:
   enabled: {{consent_enabled}}
   # Namespace for kubernetes cluster
-  namespace: {{usct_namespace}}
+  namespace: {{joget_namespace}}
   # Prefix for kubernetes object names
   storageClassName: "oci-bv"
   adminDashboard:
@@ -197,7 +197,7 @@ consentbb:
     enabled: true
     image: bitnami/postgresql:14.10.0
     username: bn_keycloak
-  prefix: {{usct_prefix}}
+  prefix: {{joget_prefix}}
   privacyDashboard:
     configuration:
       baseUrl: https://consentbb-api.{{domain}}/v2

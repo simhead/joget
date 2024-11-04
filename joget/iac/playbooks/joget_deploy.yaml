@@ -5,4 +5,4 @@
   roles:
     - joget.iac.bastion_common
     - joget.iac.oke_common
-    - joget.iac.usct_deploy
+    - joget.iac.joget_deploy

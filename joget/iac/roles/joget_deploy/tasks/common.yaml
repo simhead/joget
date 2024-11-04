@@ -16,14 +16,14 @@
 
 - name: Cleanup previously cloned repository
   ansible.builtin.file:
-    path: /root/joget/usct_backend
+    path: /root/joget/joget_backend
     state: absent
 
 
 - name: Clone Sandbox Backend Deployment Repo
   ansible.builtin.git:
-    repo: https://github.com/oci-sunbird/sandbox-usecase-usct-backend.git
-    dest: /root/joget/usct_backend
+    repo: https://github.com/oci-sunbird/sandbox-usecase-joget-backend.git
+    dest: /root/joget/joget_backend
     single_branch: yes
     version: customized_backend
 

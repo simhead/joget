@@ -1,7 +1,7 @@
 # The defaults folder contains a main.yaml file that defines default variables for the role.
 # Variables in defaults/main.yaml have the lowest precedence, meaning they can be easily overridden by other variables in your playbooks, inventory, or other variable files.
-usct_namespace: sandbox-im
-usct_prefix: sandbox
+joget_namespace: joget-app
+joget_prefix: joget
 
 backend_enabled: true
 frontend_enabled: true
@@ -19,16 +19,16 @@ frontend_ingress_enabled: true
 
 backend_image: jogetworkflow/joget-dx8-tomcat9
 backend_image_tag: 8.1.4
-# backend_image: ghcr.io/oci-sunbird/sandbox-usecase-usct-backend
+# backend_image: ghcr.io/oci-sunbird/sandbox-usecase-joget-backend
 # backend_image_tag: latest
 # backend_auth_mode: local
 # backend_payment_mode: emulator
-# backend_payment_base_url: http://sandbox-xroad-ss2.{{usct_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/api
-# backend_payment_hub_acc_map_url: http://sandbox-xroad-ss2.{{usct_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/account-mapper
-# backend_payment_hub_bulk_conn_url: http://sandbox-xroad-ss2.{{usct_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/bulk-connector
-# backend_payment_hub_callback_url: http://backend.{{usct_namespace}}.svc.cluster.local:8080
-# backend_open_ims_url: http://sandbox-xroad-ss2.{{usct_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/DIGITAL-REGISTRIES/api/data/registryname/111?search=package&filter=phone
-# backend_open_ims_emulator_url: http://sandbox-xroad-ss2.{{usct_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/DIGITAL-REGISTRIES/emulator/api/v1/data/bpkg/1.0
+# backend_payment_base_url: http://sandbox-xroad-ss2.{{joget_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/api
+# backend_payment_hub_acc_map_url: http://sandbox-xroad-ss2.{{joget_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/account-mapper
+# backend_payment_hub_bulk_conn_url: http://sandbox-xroad-ss2.{{joget_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/PAYMENT/bulk-connector
+# backend_payment_hub_callback_url: http://backend.{{joget_namespace}}.svc.cluster.local:8080
+# backend_open_ims_url: http://sandbox-xroad-ss2.{{joget_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/DIGITAL-REGISTRIES/api/data/registryname/111?search=package&filter=phone
+# backend_open_ims_emulator_url: http://sandbox-xroad-ss2.{{joget_namespace}}.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/DIGITAL-REGISTRIES/emulator/api/v1/data/bpkg/1.0
 # backend_consent_url: http://sandbox-xroad-ss2.sandbox-im.svc.cluster.local:8080/r1/SANDBOX/GOV/PROVIDER/CONSENT/api/service/individual/record/
 # backend_consent_mode: local
 # backend_consent_token: ""
@@ -39,7 +39,7 @@ backend_image_tag: 8.1.4
 # open_imis_deployment_password: Welc@me1234
 # open_imis_postgress_password: Welc@me1234
 
-# frontend_image: ghcr.io/oci-sunbird/sandbox-usecase-usct-frontend:latest
+# frontend_image: ghcr.io/oci-sunbird/sandbox-usecase-joget-frontend:latest
 
 # consent_smtp_admin_email: xyz@gmail.com
 # consent_smtp_user_email: xyz@gmail.com

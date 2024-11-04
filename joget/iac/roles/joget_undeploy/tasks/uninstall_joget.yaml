@@ -18,7 +18,7 @@
 
 # - name: Uninstall Joget
 #   shell: |
-#     helm uninstall usct --namespace sandbox-im
+#     helm uninstall joget --namespace sandbox-im
 #     sleep 60
 #     for pvc in $(kubectl -n sandbox-im get pvc -o name); do
 #       kubectl -n sandbox-im delete $pvc
@@ -35,7 +35,7 @@
 #     - consentbb-admin-dashboard
 #     - consentbb-privacy-dashboard
 #     - consentbb-api
-#     - usct-frontend
+#     - joget-frontend
 #     - im-ss1
 #     - im-ss2
 #     - im-ss3
