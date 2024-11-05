@@ -20,12 +20,12 @@
     state: absent
 
 
-- name: Clone Sandbox Backend Deployment Repo
-  ansible.builtin.git:
-    repo: https://github.com/oci-sunbird/sandbox-usecase-joget-backend.git
-    dest: /root/joget/joget_backend
-    single_branch: yes
-    version: customized_backend
+# - name: Clone Sandbox Backend Deployment Repo
+#   ansible.builtin.git:
+#     repo: https://github.com/oci-sunbird/sandbox-usecase-joget-backend.git
+#     dest: /root/joget/joget_backend
+#     single_branch: yes
+#     version: customized_backend
 
 - name: Deploy service monitors
   shell: kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
