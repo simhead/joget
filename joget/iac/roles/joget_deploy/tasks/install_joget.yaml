@@ -16,8 +16,23 @@
     dest: "/root/joget/change_joget_admin_password.sh"
     mode: '0755'
 
+- name: Generate hashed admin password
+  ansible.builtin.shell: "echo -n '{{ joget_password_plain }}' | md5sum | awk '{print $1}'"
+  register: joget_password
+
+- name: Set joget_admin_password with hashed value
+  ansible.builtin.set_fact:
+    joget_admin_password: "{{ joget_password.stdout }}"
+
+- name: "Define MySQL script"
+  template:
+    src: "jwdb-mysql.sql.j2"
+    dest: "/root/joget/jwdb-mysql.sql"
+    mode: "0755"
+
 - name: Create configmap for jwdb using MySQL script
   shell: |
+    echo 'hashed password: {{ joget_admin_password }}'
     kubectl -n {{joget_namespace}} create configmap jwdb-sql-config --from-file=/root/joget/jwdb-mysql.sql
 
 # "kubectl -n $JOGETNAMESPACE create configmap jwdb-sql-config --from-file=/home/ubuntu/workspace/jwdb-mysql.sql"

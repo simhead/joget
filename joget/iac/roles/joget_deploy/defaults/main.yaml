@@ -11,6 +11,7 @@ mysql_root_password: "password"
 joget_image_name: jogetworkflow/joget-dx8-tomcat9
 joget_image_tag: 8.1.4
 joget_endpoint: "joget.test.example"
+joget_password_plain: Ch@ngeme123
 
 # backend_image: ghcr.io/oci-sunbird/sandbox-usecase-joget-backend
 # backend_image_tag: latest

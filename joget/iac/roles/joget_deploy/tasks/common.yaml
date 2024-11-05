@@ -4,12 +4,6 @@
     dest: "/root/check_deployment.sh"
     mode: "0755"
 
-- name: "Copy MySQL script"
-  copy:
-    src: "jwdb-mysql.sql"
-    dest: "/root/joget/jwdb-mysql.sql"
-    mode: "0755"
-
 - name: Create a k8s namespace
   kubernetes.core.k8s:
     name: "{{item}}"
