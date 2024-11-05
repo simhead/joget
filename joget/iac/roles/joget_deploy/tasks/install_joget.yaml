@@ -58,10 +58,10 @@
     kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
 
 - name: Retrieve load balancer IP
-  command: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
+  ansible.builtin.shell: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
   register: lb_ip
-  delegate_to: localhost
-  ignore_errors: yes  # Allows the playbook to continue even if this command fails
+  failed_when: false
+  # ignore_errors: yes  # Ignore the error for now to handle it gracefully
 
 - name: Set load balancer IP variable
   set_fact:
@@ -73,8 +73,9 @@
 
 - name: Save load balancer IP to file
   copy:
-    content: "{{ lb_ip.stdout }}"
+    content: "{{ lb_ip.stdout if lb_ip.stdout else 'IP not available' }}"
     dest: /root/joget/loadbalancer_ip.txt
+  when: lb_ip.rc == 0
 
 # - name: Wait for deployments
 #   shell: bash /root/check_deployment.sh {{joget_namespace}}
