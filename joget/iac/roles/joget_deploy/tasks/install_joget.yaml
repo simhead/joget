@@ -74,7 +74,8 @@
 - name: Save load balancer IP to file
   copy:
     content: "{{ lb_ip.stdout if lb_ip.stdout else 'IP not available' }}"
-    dest: /root/joget/loadbalancer_ip.txt
+    dest: /tmp/loadbalancer_ip.txt
+  delegate_to: localhost  # Save to localhost
   when: lb_ip.rc == 0
 
 # - name: Wait for deployments
