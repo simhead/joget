@@ -10,11 +10,18 @@
     dest: "/root/joget/joget-dx8-tomcat9-deployment.yaml"
     mode: '0755'
 
-- name: Copy run change admin password scripts
+- name: Define change admin password script
   template:
     src: "change_joget_admin_password.sh.j2"
     dest: "/root/joget/change_joget_admin_password.sh"
     mode: '0755'
+
+- name: Create configmap for jwdb using MySQL script
+  shell: |
+    kubectl -n {{joget_namespace}} create configmap jwdb-sql-config --from-file=/root/joget/jwdb-mysql.sql
+
+# "kubectl -n $JOGETNAMESPACE create configmap jwdb-sql-config --from-file=/home/ubuntu/workspace/jwdb-mysql.sql"
+
 
 # - name: Install joget
 #   shell: |
