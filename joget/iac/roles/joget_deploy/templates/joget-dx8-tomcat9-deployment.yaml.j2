@@ -1,0 +1,196 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: joget-app-datasource-config-jwdb
+  namespace: "{{ joget_namespace | default('default') }}"
+data:
+  app_datasource-jwdb.properties: |
+    workflowDriver=com.mysql.jdbc.Driver
+    workflowUrl=jdbc\:mysql\://mysql\:3306/jwdb?characterEncoding\=UTF-8&useSSL\=false&allowPublicKeyRetrieval\=true
+    workflowPassword=password
+    workflowUser=root
+    profileName=jwdb
+  app_datasource.properties: |
+    currentProfile=jwdb
+    #log4j.rootLogger=INFO, stdout, file
+    # log4j.logger.org.joget=DEBUG
+    # log4j.logger.com.joget.workflow=DEBUG
+    # log4j.logger.org.springframework.jdbc=DEBUG
+    # log4j.logger.org.apache.commons.dbcp=DEBUG
+---  
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: joget-dx8-tomcat9-pvc
+  namespace: "{{ joget_namespace | default('default') }}"
+spec:
+  storageClassName: "oci-bv"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joget-dx8-tomcat9
+  namespace: "{{ joget_namespace | default('default') }}"
+  labels: 
+    app: joget-dx8-tomcat9
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joget-dx8-tomcat9
+  template:
+    metadata:
+      labels: 
+        app: joget-dx8-tomcat9
+    spec:
+      volumes:
+        - name: joget-dx8-tomcat9-pv
+          persistentVolumeClaim:
+            claimName: joget-dx8-tomcat9-pvc
+        # - name: csrfguard-config-volume
+        #   configMap:
+        #     name: csrf-guard-config  # ConfigMap containing Owasp.CsrfGuard.properties
+        #     items:
+        #       - key: Owasp.CsrfGuard.properties
+        #         path: Owasp.CsrfGuard.properties
+        - name: app-datasource-config-profile
+          configMap:
+            name: joget-app-datasource-config-jwdb
+            items:
+              - key: app_datasource.properties
+                path: app_datasource.properties
+        - name: app-datasource-config-jwdb
+          configMap:
+            name: joget-app-datasource-config-jwdb
+            items:
+              - key: app_datasource-jwdb.properties
+                path: app_datasource-jwdb.properties
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0  # Adjust as necessary for tomcat user group
+      # initContainers:
+      #   - name: init-csrf-guard-config
+      #     image: busybox
+      #     command: ['sh', '-c', 'cp /config/Owasp.CsrfGuard.properties /opt/joget/wflow/']
+      #     volumeMounts:
+      #       - name: csrfguard-config-volume
+      #         mountPath: /config
+      #       - name: joget-dx8-tomcat9-pv
+      #         mountPath: /opt/joget/wflow
+      containers:
+        - name: joget-dx8-tomcat9
+          image: jogetworkflow/joget-dx8-tomcat9:8.1.4 
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+          - name: joget-dx8-tomcat9-pv
+            mountPath: /opt/joget/wflow
+          - name: app-datasource-config-profile
+            mountPath: /opt/joget/wflow/app_datasource.properties
+            subPath: app_datasource.properties
+          - name: app-datasource-config-jwdb
+            mountPath: /opt/joget/wflow/app_datasource-jwdb.properties
+            subPath: app_datasource-jwdb.properties
+          env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+                fieldRef:
+                    fieldPath: metadata.namespace
+          - name: MYSQL_HOST
+            value: mysql
+          - name: MYSQL_DATABASE
+            value: jwdb
+          - name: MYSQL_PORT
+            value: "3306"
+          - name: MYSQL_USER
+            value: root
+          - name: MYSQL_PASSWORD
+            value: password
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-info-role
+  namespace: "{{ joget_namespace | default('default') }}"
+rules:
+-  apiGroups: ["apps"]
+   resources: ["replicasets"]
+   verbs: ["get", "list", "watch"]
+-  apiGroups: [""]
+   resources: ["pods"]
+   verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deployment-info-rolebinding
+  namespace: "{{ joget_namespace | default('default') }}"
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: "{{ joget_namespace | default('default') }}"
+roleRef:
+  kind: Role
+  name: deployment-info-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joget-dx8-tomcat9
+  namespace: "{{ joget_namespace | default('default') }}"
+  labels:
+    app: joget-dx8-tomcat9
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: https
+    port: 9080
+    targetPort: 9080  
+  selector:
+    app: joget-dx8-tomcat9
+  type: ClusterIP
+---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: joget-dx8-tomcat9-clusterrolebinding
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: view
+# subjects:
+#   - kind: ServiceAccount
+#     name: default
+#     namespace: joget-app
+---              
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: joget-dx8-tomcat9-ingress
+  namespace: "{{ joget_namespace | default('default') }}"
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${joget_endpoint}"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: joget-dx8-tomcat9
+                port:
+                  number: 8080              
+
+       

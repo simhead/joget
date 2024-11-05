@@ -3,22 +3,17 @@
 joget_namespace: joget-app
 joget_prefix: joget
 
-backend_enabled: true
-frontend_enabled: true
-open_imis_enabled: true
-im_enabled: true
-consent_enabled: true
-payment_hub_enabled: false
-payment_emulator_enabled: true
-digital_registries_emulator_enabled: true
-
+pvc_access_mode: "ReadWriteOnce"
+pvc_size: 20
+mysql_version: "8.0"
+mysql_root_password: "password"
 
 ## ingress section
 
 frontend_ingress_enabled: true
 
-backend_image: jogetworkflow/joget-dx8-tomcat9
-backend_image_tag: 8.1.4
+backend_image: "jogetworkflow/joget-dx8-tomcat9"
+backend_image_tag: "8.1.4"
 # backend_image: ghcr.io/oci-sunbird/sandbox-usecase-joget-backend
 # backend_image_tag: latest
 # backend_auth_mode: local

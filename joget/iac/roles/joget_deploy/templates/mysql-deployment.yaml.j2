@@ -1,0 +1,101 @@
+# ConfigMap for MySQL configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: "{{ joget_namespace | default('default') }}"
+data:
+  my.cnf: |
+    [mysqld]
+    # innodb_file_format=BARRACUDA
+    # innodb_file_per_table=1
+    # innodb_large_prefix=1
+    # innodb_default_row_format=DYNAMIC
+    # default_authentication_plugin=mysql_native_password
+---
+
+---
+# Persistent Volume Claim for MySQL
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  namespace: "{{ joget_namespace | default('default') }}"
+spec:
+  storageClassName: "oci-bv"
+  accessModes:
+    - {{ pvc_access_mode }}
+  resources:
+    requests:
+      storage: {{ pvc_size }}Gi
+---
+# MySQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: "{{ joget_namespace | default('default') }}"
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  type: ClusterIP
+---
+# MySQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: "{{ joget_namespace | default('default') }}"
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+      - name: cleanup-mysql-data
+        image: busybox
+        command: ["sh", "-c", "rm -rf /var/lib/mysql/*"]
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      containers:
+      - image: mysql:{{ mysql_version }}  # MySQL version passed as variable
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "{{ mysql_root_password }}"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-config
+          mountPath: /etc/mysql/my.cnf
+          subPath: my.cnf
+        - name: mysql-datasource-config-jwdb
+          mountPath: /docker-entrypoint-initdb.d/01-jwdb-mysql.sql # MySQL init script path
+          subPath: jwdb-mysql.sql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+      - name: mysql-config
+        configMap:
+          name: mysql-config
+      - name: mysql-datasource-config-jwdb
+        configMap:
+          name: jwdb-sql-config
+          items:
+            - key: jwdb-mysql.sql
+              path: jwdb-mysql.sql
+---
+
