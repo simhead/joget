@@ -73,8 +73,8 @@
 
 - name: Save load balancer IP to file
   copy:
-    content: "{{ lb_ip.stdout if lb_ip.stdout else 'IP not available' }}"
-    dest: /tmp/loadbalancer_ip.txt
+    content: "{{ lb_ip.stdout if lb_ip.rc == 0 else 'IP not available' }}"
+    dest: "/home/{{ ansible_user }}/loadbalancer_ip.txt" 
   delegate_to: localhost  # Save to localhost
   when: lb_ip.rc == 0
 
