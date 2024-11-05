@@ -61,9 +61,15 @@
   command: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
   register: lb_ip
   delegate_to: localhost
-  retries: 10
-  delay: 15
-  until: lb_ip.stdout != ""
+  ignore_errors: yes  # Allows the playbook to continue even if this command fails
+
+- name: Set load balancer IP variable
+  set_fact:
+    loadbalancer_ip: "{{ lb_ip.stdout | default('') }}"  # Use default to handle missing stdout
+
+- name: Debug load balancer IP
+  debug:
+    msg: "Load balancer IP is: {{ loadbalancer_ip }}"
 
 - name: Save load balancer IP to file
   copy:
