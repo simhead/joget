@@ -30,13 +30,15 @@
     dest: "/root/joget/jwdb-mysql.sql"
     mode: "0755"
 
-- name: Create configmap for jwdb using MySQL script
-  shell: |
-    echo 'hashed password: {{ joget_admin_password }}'
-    kubectl -n {{joget_namespace}} create configmap jwdb-sql-config --from-file=/root/joget/jwdb-mysql.sql
+- name: Check if ConfigMap exists
+  ansible.builtin.shell: "kubectl -n {{ joget_namespace }} get configmap jwdb-sql-config --ignore-not-found"
+  register: configmap_check
+  changed_when: false
+  failed_when: false
 
-# "kubectl -n $JOGETNAMESPACE create configmap jwdb-sql-config --from-file=/home/ubuntu/workspace/jwdb-mysql.sql"
-
+- name: Create ConfigMap jwdb-sql-config if it does not exist
+  ansible.builtin.shell: "kubectl -n {{ joget_namespace }} create configmap jwdb-sql-config --from-file=/root/joget/jwdb-mysql.sql"
+  when: configmap_check.stdout == ""
 
 # - name: Install joget
 #   shell: |
