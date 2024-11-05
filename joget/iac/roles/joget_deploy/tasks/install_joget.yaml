@@ -44,6 +44,15 @@
   shell: |
     kubectl apply -f /root/joget/mysql-deployment.yaml 
 
+- name: Wait for MySQL pod to be ready
+  shell: |
+    kubectl get pods -n {{ joget_namespace }} -l app=mysql -o jsonpath='{.items[0].status.phase}'
+  register: mysql_pod_status
+  until: mysql_pod_status.stdout == "Running"
+  retries: 10
+  delay: 15
+  changed_when: false
+
 - name: Install joget using 'joget-dx8-tomcat9-deployment.yaml'
   shell: |
     kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
