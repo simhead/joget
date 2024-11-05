@@ -57,6 +57,19 @@
   shell: |
     kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
 
+- name: Retrieve load balancer IP
+  command: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
+  register: lb_ip
+  delegate_to: localhost
+  retries: 10
+  delay: 15
+  until: lb_ip.stdout != ""
+
+- name: Save load balancer IP to file
+  copy:
+    content: "{{ lb_ip.stdout }}"
+    dest: /root/joget/loadbalancer_ip.txt
+
 # - name: Wait for deployments
 #   shell: bash /root/check_deployment.sh {{joget_namespace}}
 
