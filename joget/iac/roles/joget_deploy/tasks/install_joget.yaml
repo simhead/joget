@@ -40,11 +40,13 @@
   ansible.builtin.shell: "kubectl -n {{ joget_namespace }} create configmap jwdb-sql-config --from-file=/root/joget/jwdb-mysql.sql"
   when: configmap_check.stdout == ""
 
-# - name: Install joget
-#   shell: |
-#     cd /root/govstack/joget_backend/sandbox-demo-builder/use-cases
-#     helm dependency update ./joget-full/
-#     helm upgrade --install joget ./joget-full/ --create-namespace --namespace {{joget_namespace}} --values /root/govstack/joget_backend/sandbox-demo-builder/use-cases/joget-full/demo-builder-values.yaml
+- name: Install mysql using 'mysql-deployment.yaml'
+  shell: |
+    kubectl apply -f /root/joget/mysql-deployment.yaml 
+
+- name: Install joget using 'joget-dx8-tomcat9-deployment.yaml'
+  shell: |
+    kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
 
 # - name: Wait for deployments
 #   shell: bash /root/check_deployment.sh {{joget_namespace}}
