@@ -84,7 +84,7 @@ spec:
       #         mountPath: /opt/joget/wflow
       containers:
         - name: joget-dx8-tomcat9
-          image: jogetworkflow/joget-dx8-tomcat9:8.1.4 
+          image: {{ joget_image_name }}:{{ joget_image_tag }}
           ports:
           - containerPort: 8080
           volumeMounts:
@@ -182,8 +182,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "${joget_endpoint}"
-      http:
+    # - host: "{{ joget_endpoint }}"
+    - http:
         paths:
           - path: /
             pathType: ImplementationSpecific

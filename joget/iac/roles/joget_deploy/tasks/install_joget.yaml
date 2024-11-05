@@ -13,7 +13,7 @@
 - name: Copy run change admin password scripts
   template:
     src: "change_joget_admin_password.sh.j2"
-    dest: "change_joget_admin_password.sh"
+    dest: "/root/joget/change_joget_admin_password.sh"
     mode: '0755'
 
 # - name: Install joget
