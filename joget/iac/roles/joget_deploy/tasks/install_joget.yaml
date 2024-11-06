@@ -17,7 +17,7 @@
     mode: '0755'
 
 - name: Generate hashed admin password
-  ansible.builtin.shell: "echo -n '{{ joget_password_plain }}' | md5sum | awk '{print $1}'"
+  ansible.builtin.shell: "echo -n '{{ auth_token }}' | md5sum | awk '{print $1}'"
   register: joget_password
 
 - name: Set joget_admin_password with hashed value
