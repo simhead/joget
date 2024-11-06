@@ -52,6 +52,7 @@
     state: directory
     mode: '0755'
   with_items:
+    - /root/joget
     - /root/proj_joget/customization
     - /root/proj_joget/customization/cert-manager
 
