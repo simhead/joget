@@ -48,6 +48,8 @@ kind: Deployment
 metadata:
   name: mysql
   namespace: "{{ joget_namespace | default('default') }}"
+  labels: 
+    app: mysql
 spec:
   selector:
     matchLabels:

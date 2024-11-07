@@ -43,6 +43,8 @@
 - name: Install mysql using 'mysql-deployment.yaml'
   shell: |
     kubectl apply -f /root/joget/mysql-deployment.yaml 
+    sleep 60
+    kubectl -n {{ joget_namespace }} rollout restart deployment --selector=app=mysql
 
 - name: Wait for MySQL pod to be ready
   shell: |
@@ -56,11 +58,9 @@
 - name: Install joget using 'joget-dx8-tomcat9-deployment.yaml'
   shell: |
     kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
+    sleep 120
+    kubectl -n {{ joget_namespace }} rollout restart deployment --selector=app=joget-dx8-tomcat9
 
-- name: Restart all deployments
-  shell: |
-    kubectl -n {{ joget_namespace }} rollout restart deployment
-    
 - name: Retrieve load balancer IP
   ansible.builtin.shell: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
   register: lb_ip
