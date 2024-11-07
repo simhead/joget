@@ -7,7 +7,7 @@ data:
   app_datasource-jwdb.properties: |
     workflowDriver=com.mysql.jdbc.Driver
     workflowUrl=jdbc\:mysql\://mysql\:3306/jwdb?characterEncoding\=UTF-8&useSSL\=false&allowPublicKeyRetrieval\=true
-    workflowPassword=password
+    workflowPassword={{ auth_token }}
     workflowUser=root
     profileName=jwdb
   app_datasource.properties: |

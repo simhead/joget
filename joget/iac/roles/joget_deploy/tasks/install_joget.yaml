@@ -57,6 +57,10 @@
   shell: |
     kubectl apply -f /root/joget/joget-dx8-tomcat9-deployment.yaml
 
+- name: Restart all deployments
+  shell: |
+    kubectl -n {{ joget_namespace }} rollout restart deployment
+    
 - name: Retrieve load balancer IP
   ansible.builtin.shell: "kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
   register: lb_ip
