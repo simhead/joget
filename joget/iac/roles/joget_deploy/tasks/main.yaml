@@ -5,7 +5,7 @@
 # If additional task files are needed for modularity or organization, they can be included from main.yaml to structure the workflow better.
 
 - include_tasks: common.yaml
-- include_tasks: install_certmanager.yaml
+#- include_tasks: install_certmanager.yaml
 - include_tasks: install_nginx_controller.yaml
 #- include_tasks: update_zone_record.yaml
 - include_tasks: install_joget.yaml
