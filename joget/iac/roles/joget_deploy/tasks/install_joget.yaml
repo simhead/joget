@@ -10,6 +10,12 @@
     dest: "/root/joget/joget-dx8-tomcat9-deployment.yaml"
     mode: '0755'
 
+- name: Configure Tomcat server.xml
+  template:
+    src: "tomcat-server.xml.j2"
+    dest: "/root/joget/tomcat-server.xml"
+    mode: '0755'
+
 - name: Define change admin password script
   template:
     src: "change_joget_admin_password.sh.j2"
@@ -54,6 +60,43 @@
   retries: 10
   delay: 15
   changed_when: false
+
+- name: Ensure TLS directory exists
+  file:
+    path: "{{ joget_tls_path }}"
+    state: directory
+    mode: '0700'
+
+- name: Generate self-signed SSL certificate if not provided
+  command: >
+    openssl req -x509 -nodes -days 3650 -newkey rsa:2048
+    -keyout "{{ joget_tls_path }}/client-key.pem"
+    -out "{{ joget_tls_path }}/client-cert.pem"
+    -subj "/CN={{ joget_common_name }}"
+  args:
+    creates: "{{ joget_tls_path }}/client-key.pem"
+
+- name: Create a TLS Secret for Joget app
+  shell: |
+    kubectl create secret generic joget-tls-secret \
+      --from-file={{ joget_tls_path }}/client-cert.pem \
+      --from-file={{ joget_tls_path }}/client-key.pem \
+      --from-file={{ joget_tls_path }}/ca-cert.pem \
+      -n {{ joget_namespace }}
+  register: tls_secret_creation
+  ignore_errors: yes  # Ignore if the secret already exists
+
+- name: Debug TLS Secret Creation
+  debug:
+    msg: "{{ tls_secret_creation.stdout }}"
+
+- name: Create ConfigMap for Tomcat server.xml
+  shell: |
+    kubectl -n {{ joget_namespace }} create configmap {{ joget_tomcat_configmap }} \
+      --from-file=server.xml={{ joget_server_xml_path }} \
+      --dry-run=client -o yaml | kubectl apply -f -
+  args:
+    warn: false
 
 - name: Install joget using 'joget-dx8-tomcat9-deployment.yaml'
   shell: |

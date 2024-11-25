@@ -52,6 +52,12 @@ spec:
         - name: joget-dx8-tomcat9-pv
           persistentVolumeClaim:
             claimName: joget-dx8-tomcat9-pvc
+        # - name: csrfguard-config-volume
+        #   configMap:
+        #     name: csrf-guard-config  # ConfigMap containing Owasp.CsrfGuard.properties
+        #     items:
+        #       - key: Owasp.CsrfGuard.properties
+        #         path: Owasp.CsrfGuard.properties
         - name: app-datasource-config-profile
           configMap:
             name: joget-app-datasource-config-jwdb
@@ -64,18 +70,23 @@ spec:
             items:
               - key: app_datasource-jwdb.properties
                 path: app_datasource-jwdb.properties
-        - name: joget-tls
-          secret:
-            secretName: joget-tls-secret  # Secret containing SSL certificates
       securityContext:
         runAsUser: 0
         fsGroup: 0  # Adjust as necessary for tomcat user group
+      # initContainers:
+      #   - name: init-csrf-guard-config
+      #     image: busybox
+      #     command: ['sh', '-c', 'cp /config/Owasp.CsrfGuard.properties /opt/joget/wflow/']
+      #     volumeMounts:
+      #       - name: csrfguard-config-volume
+      #         mountPath: /config
+      #       - name: joget-dx8-tomcat9-pv
+      #         mountPath: /opt/joget/wflow
       containers:
         - name: joget-dx8-tomcat9
           image: {{ joget_image_name }}:{{ joget_image_tag }}
           ports:
-          - containerPort: 8443  # For SSL traffic
-          - containerPort: 8080  # Optionally keep HTTP for testing
+          - containerPort: 8080
           volumeMounts:
           - name: joget-dx8-tomcat9-pv
             mountPath: /opt/joget/wflow
@@ -85,9 +96,6 @@ spec:
           - name: app-datasource-config-jwdb
             mountPath: /opt/joget/wflow/app_datasource-jwdb.properties
             subPath: app_datasource-jwdb.properties
-          - name: joget-tls
-            mountPath: /opt/joget/tls
-            readOnly: true
           env:
           - name: KUBERNETES_NAMESPACE
             valueFrom:
@@ -150,6 +158,19 @@ spec:
     app: joget-dx8-tomcat9
   type: ClusterIP
 ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: joget-dx8-tomcat9-clusterrolebinding
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: view
+# subjects:
+#   - kind: ServiceAccount
+#     name: default
+#     namespace: joget-app
+---              
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

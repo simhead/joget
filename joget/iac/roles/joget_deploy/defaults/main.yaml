@@ -2,6 +2,10 @@
 # Variables in defaults/main.yaml have the lowest precedence, meaning they can be easily overridden by other variables in your playbooks, inventory, or other variable files.
 joget_namespace: joget-app
 joget_prefix: joget
+joget_tls_path: "/root/joget/tls"
+joget_server_xml_path: "/root/joget/tomcat-server.xml"
+joget_tomcat_configmap: "joget-tomcat-config"
+joget_common_name: "joget-app.demo"
 
 pvc_access_mode: "ReadWriteOnce"
 pvc_size: 20
