@@ -79,7 +79,7 @@ spec:
           image: {{ joget_image_name }}:{{ joget_image_tag }}
           ports:
           - containerPort: 8443  # For SSL traffic
-          - containerPort: 8080  # Optionally keep HTTP for testing
+          #- containerPort: 8080  # Optionally keep HTTP for testing
           volumeMounts:
           - name: joget-dx8-tomcat9-pv
             mountPath: /opt/joget/wflow
@@ -147,9 +147,6 @@ metadata:
     app: joget-dx8-tomcat9
 spec:
   ports:
-  - name: http
-    port: 8080
-    targetPort: 8080
   - name: https
     port: 9080
     targetPort: 9080  
@@ -175,13 +172,6 @@ spec:
     # - host: "{{ joget_endpoint }}"
     - http:
         paths:
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: joget-dx8-tomcat9
-                port:
-                  number: 8080  # HTTP port
           - path: /
             pathType: ImplementationSpecific
             backend:
