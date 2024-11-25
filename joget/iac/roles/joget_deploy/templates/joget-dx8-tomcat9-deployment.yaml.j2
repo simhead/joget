@@ -67,6 +67,9 @@ spec:
         - name: joget-tls
           secret:
             secretName: joget-tls-secret  # Secret containing SSL certificates
+        - name: tomcat-config
+          configMap:
+            name: {{ joget_tomcat_configmap }}
       securityContext:
         runAsUser: 0
         fsGroup: 0  # Adjust as necessary for tomcat user group
@@ -88,6 +91,9 @@ spec:
           - name: joget-tls
             mountPath: /opt/joget/tls
             readOnly: true
+          - name: tomcat-config
+            mountPath: /deployments/apache-tomcat/conf/server.xml
+            subPath: server.xml
           env:
           - name: KUBERNETES_NAMESPACE
             valueFrom:
