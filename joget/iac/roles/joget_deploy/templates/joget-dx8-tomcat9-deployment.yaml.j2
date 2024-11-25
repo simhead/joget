@@ -152,6 +152,9 @@ spec:
   - name: https
     port: 9080
     targetPort: 9080  
+  - name: secure-https
+    port: 8443
+    targetPort: 8443
   selector:
     app: joget-dx8-tomcat9
   type: ClusterIP
@@ -177,5 +180,27 @@ spec:
                 name: joget-dx8-tomcat9
                 port:
                   number: 8080              
-
-       
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: joget-dx8-tomcat9-ingress-ssl
+  namespace: "{{ joget_namespace | default('default') }}"
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Enforces HTTPS redirection
+spec:
+  ingressClassName: nginx
+  tls:
+  - secretName: joget-tls-secret  # TLS secret for HTTPS
+  rules:
+  - http:
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: joget-dx8-tomcat9
+              port:
+                number: 8443
