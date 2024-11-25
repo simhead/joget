@@ -76,14 +76,21 @@
   args:
     creates: "{{ joget_tls_path }}/client-key.pem"
 
-- name: Create a TLS Secret for Joget app
+- name: Check if joget-tls-secret exists
+  shell: |
+    kubectl get secret joget-tls-secret -n {{ joget_namespace }} > /dev/null 2>&1
+  register: secret_exists
+  ignore_errors: yes
+
+- name: Create a TLS Secret for Joget app if it does not exist
   shell: |
     kubectl create secret generic joget-tls-secret \
       --from-file={{ joget_tls_path }}/client-cert.pem \
       --from-file={{ joget_tls_path }}/client-key.pem \
       -n {{ joget_namespace }}
+  when: secret_exists.rc != 0  # Run only if the secret doesn't exist
   register: tls_secret_creation
-  ignore_errors: yes  # Ignore if the secret already exists
+  ignore_errors: yes  # Ignore if there's any error in secret creation
 
 - name: Debug TLS Secret Creation
   debug:
