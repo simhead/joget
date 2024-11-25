@@ -7,7 +7,7 @@ data:
   app_datasource-jwdb.properties: |
     workflowDriver=com.mysql.jdbc.Driver
     # workflowUrl=jdbc\:mysql\://mysql\:3306/jwdb?characterEncoding\=UTF-8&useSSL\=false&allowPublicKeyRetrieval\=true
-    workflowUrl=jdbc:mysql://{{ mysql_host | default('mysql') | ternary(mysql_host, 'mysql') }}:{{ mysql_port | default('3306') | ternary(mysql_port, '3306') }}/{{ mysql_dbname | default('jwdb') | ternary(mysql_dbname, 'jwdb') }}?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+    workflowUrl=jdbc:mysql://{{ mysql_host | default('mysql') | ternary(mysql_host, 'mysql') }}:{{ mysql_port | default('3306') | ternary(mysql_port, '3306') }}/{{ mysql_db | default('jwdb') | ternary(mysql_db, 'jwdb') }}?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
     workflowPassword={{ auth_token }}
     workflowUser=root
     profileName=jwdb
