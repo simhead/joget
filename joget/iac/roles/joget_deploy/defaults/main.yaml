@@ -13,4 +13,5 @@ mysql_version: "8.0"
 
 joget_image_name: jogetworkflow/joget-dx8-tomcat9
 joget_image_tag: 8.1.4
-joget_endpoint: "joget.test.example"
+joget_endpoint: "joget-app.demo"
+

@@ -6,7 +6,8 @@ metadata:
 data:
   app_datasource-jwdb.properties: |
     workflowDriver=com.mysql.jdbc.Driver
-    workflowUrl=jdbc\:mysql\://mysql\:3306/jwdb?characterEncoding\=UTF-8&useSSL\=false&allowPublicKeyRetrieval\=true
+    # workflowUrl=jdbc\:mysql\://mysql\:3306/jwdb?characterEncoding\=UTF-8&useSSL\=false&allowPublicKeyRetrieval\=true
+    workflowUrl=jdbc:mysql://{{ mysql_host | default('mysql') | ternary(mysql_host, 'mysql') }}:{{ mysql_port | default('3306') | ternary(mysql_port, '3306') }}/{{ mysql_dbname | default('jwdb') | ternary(mysql_dbname, 'jwdb') }}?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
     workflowPassword={{ auth_token }}
     workflowUser=root
     profileName=jwdb
@@ -167,6 +168,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
@@ -179,28 +181,12 @@ spec:
               service:
                 name: joget-dx8-tomcat9
                 port:
-                  number: 8080              
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: joget-dx8-tomcat9-ingress-ssl
-  namespace: "{{ joget_namespace | default('default') }}"
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Enforces HTTPS redirection
-spec:
-  ingressClassName: nginx
-  tls:
-  - secretName: joget-tls-secret  # TLS secret for HTTPS
-  rules:
-  - http:
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: joget-dx8-tomcat9
-              port:
-                number: 8443
+                  number: 8080  # HTTP port
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: joget-dx8-tomcat9
+                port:
+                  number: 8443  # HTTPS port              
+
