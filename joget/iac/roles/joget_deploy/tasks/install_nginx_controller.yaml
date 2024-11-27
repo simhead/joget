@@ -73,6 +73,7 @@
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
             service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb2_subnet_id }}"
+            #service.beta.kubernetes.io/oci-load-balancer-ip: "{{ joget_public_lp_ipaddress }}"
             # Optional static IP for load balancer
           #   service.beta.kubernetes.io/oci-load-balancer-ip-mode: "IPV4"  # Use IPV4; switch to IPV6 if needed
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-protocol: "HTTP"  # Health check protocol
@@ -82,6 +83,14 @@
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-healthy-threshold: "3"
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-unhealthy-threshold: "3"
           # loadBalancerIP: "{{ lb_pip }}"  # Static IP, if assigned
+        #   ports:
+        #     http: 80
+        #     https: 443
+        # config:
+        #   ssl-redirect: "true"
+        #   force-ssl-redirect: "true"
+        # extraArgs:
+        #   default-ssl-certificate: "{{ your_namespace }}/joget-tls-secret"
 
 
 - name: Get deployments in ingress-nginx namespace
