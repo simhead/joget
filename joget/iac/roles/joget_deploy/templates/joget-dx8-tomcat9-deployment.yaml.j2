@@ -67,7 +67,7 @@ spec:
                 path: app_datasource-jwdb.properties
         - name: joget-tls
           secret:
-            secretName: joget-tls-secret  # Secret containing SSL certificates
+            secretName: joget-generic-secret  # Secret containing SSL certificates
         - name: tomcat-config
           configMap:
             name: {{ joget_tomcat_configmap }}
@@ -170,7 +170,7 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - secretName: joget-tls-secret 
+    - secretName: joget-generic-secret 
   rules:
     # - host: "{{ joget_endpoint }}"
     - http:
