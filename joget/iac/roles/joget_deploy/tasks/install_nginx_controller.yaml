@@ -49,8 +49,8 @@
 - name: Create a TLS Secret for Joget app if it does not exist
   shell: |
     kubectl create secret tls joget-tls-secret \
-      --from-file={{ joget_tls_path }}/client-cert.pem \
-      --from-file={{ joget_tls_path }}/client-key.pem \
+      --cert={{ joget_tls_path }}/client-cert.pem \
+      --key={{ joget_tls_path }}/client-key.pem \
       -n {{ joget_namespace }}
   when: secret_exists.rc != 0  # Run only if the secret doesn't exist
   register: tls_secret_creation
@@ -99,6 +99,7 @@
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
             service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb2_subnet_id }}"
+            oci.oraclecloud.com/load-balancer-type: "lb"
             # Optional static IP for load balancer
           #   service.beta.kubernetes.io/oci-load-balancer-ip-mode: "IPV4"  # Use IPV4; switch to IPV6 if needed
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-protocol: "HTTP"  # Health check protocol
