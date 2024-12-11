@@ -44,9 +44,11 @@
   register: secret_exists
   ignore_errors: yes
 
+# kubectl create secret tls joget-tls-secret --cert=/root/joget/tls/client-cert.pem --key=/root/joget/tls/client-key.pem -n ingress-nginx
+# kubectl create secret generic joget-tls-secret --from-file=/root/joget/tls/client-cert.pem --from-file=/root/joget/tls/client-key.pem
 - name: Create a TLS Secret for Joget app if it does not exist
   shell: |
-    kubectl create secret generic joget-tls-secret \
+    kubectl create secret tls joget-tls-secret \
       --from-file={{ joget_tls_path }}/client-cert.pem \
       --from-file={{ joget_tls_path }}/client-key.pem \
       -n {{ joget_namespace }}
@@ -97,7 +99,6 @@
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
             service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
             service.beta.kubernetes.io/oci-load-balancer-subnet1: "{{ lb2_subnet_id }}"
-            service.beta.kubernetes.io/oci-load-balancer-ip: "{{ joget_public_lp_ipaddress }}"
             # Optional static IP for load balancer
           #   service.beta.kubernetes.io/oci-load-balancer-ip-mode: "IPV4"  # Use IPV4; switch to IPV6 if needed
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-protocol: "HTTP"  # Health check protocol
@@ -106,7 +107,7 @@
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-timeout: "3000"   # Timeout in ms
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-healthy-threshold: "3"
           #   service.beta.kubernetes.io/oci-load-balancer-health-check-unhealthy-threshold: "3"
-          # loadBalancerIP: "{{ lb_pip }}"  # Static IP, if assigned
+          loadBalancerIP: "{{ joget_public_lp_ipaddress }}"  # Static IP, if assigned
           ports:
             http: 80
             https: 443
@@ -115,7 +116,6 @@
           force-ssl-redirect: "true"
         extraArgs:
           default-ssl-certificate: "{{ joget_namespace }}/joget-tls-secret"
-
 
 - name: Get deployments in ingress-nginx namespace
   shell: bash /root/check_deployment.sh ingress-nginx
