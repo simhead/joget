@@ -53,6 +53,7 @@
     mode: '0755'
   with_items:
     - /root/joget
+    - /root/joget/tls
     - /root/proj_joget/customization
     - /root/proj_joget/customization/cert-manager
 
