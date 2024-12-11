@@ -48,6 +48,10 @@
 # kubectl create secret generic joget-tls-secret --from-file=/root/joget/tls/client-cert.pem --from-file=/root/joget/tls/client-key.pem
 - name: Create a TLS Secret for Joget app if it does not exist
   shell: |
+    kubectl create secret generic joget-generic-secret \
+      --from-file={{ joget_tls_path }}/client-cert.pem \
+      --from-file={{ joget_tls_path }}/client-key.pem \
+      -n {{ joget_namespace }}
     kubectl create secret tls joget-tls-secret \
       --cert={{ joget_tls_path }}/client-cert.pem \
       --key={{ joget_tls_path }}/client-key.pem \
